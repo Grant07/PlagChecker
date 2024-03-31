@@ -1,0 +1,163 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+{% load static %}
+<!-- END: Side Menu -->
+<!-- BEGIN: Content -->
+
+<div class="grid grid-cols-12 gap-6">
+    <div class="col-span-12 2xl:col-span-9">
+        <div class="grid grid-cols-12 gap-6">
+            <div class="col-span-12 mt-4">
+                <div class="intro-y flex items-center h-10">
+                    <h2 class="text-lg font-medium truncate mr-5">
+                        Plagirism Report
+                    </h2>
+                    <a href="" class="ml-auto flex items-center text-primary"> <i data-lucide="refresh-ccw"
+                            class="w-4 h-4 mr-3"></i> Reload Data </a>
+                </div>
+                <div class="intro-y overflow-auto lg:overflow-visible mt-8 sm:mt-0 scrollable w-full">
+                    <div class="flex gap-6">
+                        <div class="w-1/2">
+                            <iframe src="data:application/pdf;base64,{{ data.submission.file.decode }}" frameborder="10" height="600px" class="w-full"></iframe>    
+                        </div>
+
+                        <div class="w-1/2">
+                            <div class="flex items-center h-full hidden" id="loader">
+                                <div class="mx-auto my-auto">
+                                    <div class="loader"></div>
+                                    <div class="font-medium text-secondary">Loading</div>
+                                </div>
+                            </div>
+                            
+                            <iframe src="data:application/pdf;base64,{{ data.highest_similarity_submission.file.decode }}" frameborder="10" height="600px" class="w-full" id="canvas"></iframe>    
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- BEGIN: General Report -->
+            <div class="col-span-12">
+                <div class="grid grid-cols-12 gap-6 mt-5">
+                    <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
+                        <div class="report-box zoom-in">
+                            <div class="box p-5">
+                                <div class="flex">
+                                    <i data-lucide="globe" class="report-box__icon text-primary"></i>
+                                </div>
+                                <div class="text-3xl font-medium leading-8 mt-6">{{ data.students|length }}</div>
+                                <div class="text-base text-slate-500 mt-1">Online Sources</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
+                        <div class="report-box zoom-in">
+                            <div class="box p-5">
+                                <div class="flex">
+                                    <i data-lucide="copy" class="report-box__icon text-pending"></i>
+                                </div>
+                                <div class="text-3xl font-medium leading-8 mt-6">{{ data.sources|length }}</div>
+                                <div class="text-base text-slate-500 mt-1">Local Sources</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
+                        <div class="report-box zoom-in">
+                            <div class="box p-5">
+                                <div class="flex">
+                                    <i data-lucide="percent" class="report-box__icon text-warning"></i>
+                                </div>
+                                <div class="text-3xl font-medium leading-8 mt-6" id="percentage">{{ data.highest_similarity_percentage }}</div>
+                                <div class="text-base text-slate-500 mt-1">Percentage</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- END: Weekly Top Products -->
+        </div>
+    </div>
+    <div class="col-span-12 2xl:col-span-3">
+        <div class="2xl:border-l -mb-10 pb-10">
+            <div class="2xl:pl-6 grid grid-cols-12 gap-x-6 2xl:gap-x-0 gap-y-6">
+                <!-- BEGIN: Transactions -->
+                <div class="col-span-12 md:col-span-6 xl:col-span-4 2xl:col-span-12 mt-3 2xl:mt-8">
+                    <div class="intro-x flex items-center h-10">
+                        <h2 class="text-lg font-medium truncate mr-5">
+                            Potential Plagiarised Sources
+                        </h2>
+                    </div>
+                    <div class="mt-5 scrollable overflow-hidden">
+                        <div class="overflow-y-auto overflow-x-hidden max-h-[600px]" id="sources">
+                            {% for recent in data.sources %}
+                            <div class="intro-x px-1">
+                                <div class="hidden" id="submission_id">{{ recent.submission.id }}</div>
+                                <div class="hidden" id="submission_percentage">{{ recent.percentage }}</div>
+                                <div class="box px-5 py-3 mb-3 flex items-center zoom-in" id="box">
+                                    <div class="w-10 h-10 flex-none image-fit rounded-full overflow-hidden">
+                                        <img alt="Midone - HTML Admin Template" src="data:image/*;base64,{{ recent.submission.student.user.image.decode }}">
+                                    </div>
+                                    <div class="ml-4 mr-auto">
+                                        <div class="font-medium">{{ recent.submission.student.user.get_full_name }}</div>
+                                        <div class="text-slate-500 text-xs mt-0.5">{{ recent.submission.date_submitted }}</div>
+                                    </div>
+                                    <div class="text-success"><i data-lucide="link" class="w-4 h-4 mr-2"></i></div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+{% include 'components/slider_modal.html' %}
+{% include 'components/delete_modal.html' %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        $('.intro-x.px-1').click(function(){
+            // Find the submission_id within the clicked div
+            var submissionId = $(this).find('#submission_id').text().trim();
+            var percentage = $(this).find('#submission_percentage').text().trim();
+
+            $("#loader").removeClass("hidden");
+            $("#canvas").addClass("hidden");
+
+            $.ajax({
+                type: "GET",
+                url: "{% url 'get_file' %}",
+                data: {
+                    file_id: submissionId,
+                    file_type: "submission"
+                },
+                success: function (response) {
+                    setTimeout(function () {
+                        $("#loader").addClass("hidden");
+                        $("#canvas").removeClass("hidden");
+                    }, 1000)
+
+                    $("#canvas").attr('src', 'data:application/pdf;base64,' + response["file"]);
+                    $("#percentage").text(percentage);
+
+                },
+                error: function (response) {
+                    $("#notification-content").text(response.responseJSON.message);
+                    Toastify({
+                        node: $("#notification").clone().removeClass("hidden")[0],
+                        duration: 3000,
+                        newWindow: true,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        stopOnFocus: true,
+                    }).showToast();
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

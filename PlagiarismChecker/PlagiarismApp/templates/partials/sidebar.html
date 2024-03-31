@@ -1,0 +1,92 @@
+{% load static %}
+<nav class="side-nav xl:fixed inset-y-0 z-50 overflow-y-auto">
+    <a href="{% if admin %}{% url 'admin_dashboard' %}{% else %}{% url 'dashboard' %}{% endif %}" class="intro-x flex items-center pl-5 py-1 mt-3">
+        <img alt="UDOM e-Classroom" class="w-8" src="{% static 'dist/images/logo.png' %}">
+        <span class="hidden xl:block text-white text-lg ml-3"> e-Classroom </span> 
+    </a>
+    <div class="side-nav__devider my-4"></div>
+    <ul>
+        {% if request.user.is_superuser %}
+        <li>
+            <a href="{% url 'admin_dashboard' %}" class="side-menu {% if 'dashboard' in request.path %} side-menu--active {% endif %}">
+                <div class="side-menu__icon"> <i data-lucide="gauge"></i> </div>
+                <div class="side-menu__title"> Dashboard  </div>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'programs' %}" class="side-menu {% if 'programs' in request.path %} side-menu--active {% endif %}">
+                <div class="side-menu__icon"> <i data-lucide="graduation-cap"></i> </div>
+                <div class="side-menu__title"> Manage Programs </div>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'courses' %}" class="side-menu {% if 'courses' in request.path %} side-menu--active {% endif %}">
+                <div class="side-menu__icon"> <i data-lucide="book-open"></i> </div>
+                <div class="side-menu__title"> Manage Courses </div>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'lecturers' %}" class="side-menu {% if 'users' in request.path %} side-menu--active {% endif %}">
+                <div class="side-menu__icon"> <i data-lucide="users"></i> </div>
+                <div class="side-menu__title"> Manage Lectures </div>
+            </a>
+        </li>
+        {% elif request.user.is_staff %}
+        <li>
+            <a href="{% url 'lecturer_dashboard' %}" class="side-menu {% if 'lecturer/dashboard' in request.path %} side-menu--active {% endif %}">
+                <div class="side-menu__icon"> <i data-lucide="gauge"></i> </div>
+                <div class="side-menu__title"> Dashboard  </div>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'lecturer_assignments' %}" class="side-menu {% if 'lecturer/assignments/' in request.path and 'submissions' not in request.path %} side-menu--active {% endif %}">
+                <div class="side-menu__icon"> <i data-lucide="book-open"></i> </div>
+                <div class="side-menu__title"> Assignments </div>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'get_all_submissions' %}" class="side-menu {% if 'lecturer/assignments/submissions/' in request.path %} side-menu--active {% endif %}">
+                <div class="side-menu__icon"> <i data-lucide="corner-down-right"></i> </div>
+                <div class="side-menu__title"> Submission </div>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'get_all_students' %}" class="side-menu {% if 'lecturer/students/' in request.path %} side-menu--active {% endif %}">
+                <div class="side-menu__icon"> <i data-lucide="users"></i> </div>
+                <div class="side-menu__title"> Students </div>
+            </a>
+        </li>
+        {% else %}
+        <li>
+            <a href="{% url 'dashboard' %}" class="side-menu {% if 'dashboard' in request.path %} side-menu--active {% endif %}">
+                <div class="side-menu__icon"> <i data-lucide="gauge"></i> </div>
+                <div class="side-menu__title"> Dashboard  </div>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'curriculum' %}" class="side-menu {% if 'curriculum' in request.path %} side-menu--active {% endif %}">
+                <div class="side-menu__icon"> <i data-lucide="graduation-cap"></i> </div>
+                <div class="side-menu__title"> My Curriculum </div>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'carryover' %}" class="side-menu {% if 'carryover' in request.path %} side-menu--active {% endif %}">
+                <div class="side-menu__icon"> <i data-lucide="book-open"></i> </div>
+                <div class="side-menu__title"> Carryover </div>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'electives' %}" class="side-menu {% if 'electives' in request.path %} side-menu--active {% endif %}">
+                <div class="side-menu__icon"> <i data-lucide="book-open"></i> </div>
+                <div class="side-menu__title"> Electives </div>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'short_courses' %}" class="side-menu {% if 'short_courses' in request.path %} side-menu--active {% endif %}">
+                <div class="side-menu__icon"> <i data-lucide="book-open"></i> </div>
+                <div class="side-menu__title"> Short Courses</div>
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>

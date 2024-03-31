@@ -1,0 +1,159 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+{% load static %}
+
+<div class="intro-y flex  items-center mt-8">
+    {% include 'components/admin_manage_header.html' %}
+</div>
+<!-- BEGIN: HTML Table Data -->
+<div class="intro-y overflow-auto lg:overflow-visible mt-8 sm:mt-0">
+    <div class="overflow-x-auto scrollbar-hidden">
+        <table class="table table-report sm:mt-2">
+            <tr>
+                <th class="whitespace-nowrap">#</th>
+                <th class="whitespace-nowrap">Name</th>
+                <th class="whitespace-nowrap">Course Code</th>
+                <th class="whitespace-nowrap">Credits</th>
+                <th class="whitespace-nowrap">Semester</th>
+                <th class="whitespace-nowrap">Programs</th>
+                <th class="whitespace-nowrap text-center">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for course in data.courses %}
+                <tr class="intro-x">
+                    <td class="whitespace-nowrap">{{ course.id }}</td>
+                    <td class="whitespace-nowrap">{{ course.name }}</td>
+                    <td class="whitespace-nowrap">{{ course.code }}</td>
+                    <td class="whitespace-nowrap">{{ course.credits }}</td>
+                    <td class="whitespace-nowrap">{{ course.semester }}</td>
+                    <td class="whitespace-nowrap">
+                        <div class="overflow-y-auto scrollbar-hidden max-h-60">
+                            <ul>
+                                {% for program in course.programs.all %}
+                                <li>{{ program.name }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </td>
+                    <td class="whitespace-nowrap text-center table-report__action">
+                        <div class="flex items-center justify-center">
+                            <a class="flex items-center text-primary whitespace-nowrap mr-5" href="javascript:;">
+                                <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> View Details
+                            </a>
+
+                            <a class="flex items-center text-danger whitespace-nowrap" href="javascript:;"
+                                data-tw-toggle="modal" data-tw-target="#delete-modal-preview" id="delete__form-btn">
+                                <i data-lucide="x-square" class="w-4 h-4 mr-1"></i> Delete
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- END: HTML Table Data -->
+{% include 'components/slider_modal.html' %}
+{% include 'components/delete_modal.html' %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        $("#add__form-btn").on("click", function (event) {
+            $("#loading").removeClass("hidden");
+            event.preventDefault();
+
+            $.ajax({
+                type: "POST",
+                url: "{% url 'add_course' %}",
+                data: $("#add__form").serialize(),
+                success: function (response) {
+                    $("#notification-content").text(response["message"]);
+                    $("#notification-action").text("Redirecting ");
+                    Toastify({
+                        node: $("#notification").clone().removeClass("hidden")[0],
+                        duration: 3000,
+                        newWindow: true,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        stopOnFocus: true,
+                    }).showToast();
+
+                    setTimeout(function () {
+                        window.location.href = "{% url 'courses' %}";
+                    }, 3000);
+                },
+                error: function (response) {
+                    $("#notification-content").text(response.responseJSON.message);
+                    Toastify({
+                        node: $("#notification").clone().removeClass("hidden")[0],
+                        duration: 3000,
+                        newWindow: true,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        stopOnFocus: true,
+                    }).showToast();
+                }
+            });
+        });
+
+        $(document).on("click", "#delete__form-btn", function (event) {
+            event.preventDefault();
+
+            // Extract data from the clicked row
+            var rowData = $(this).closest('tr').find('td').map(function () {
+                return $(this).text();
+            }).get();
+
+            // Update the modal content with the extracted data
+            $("#delete__model-id").val(rowData[0]);
+            $("#delete__model-content").text(rowData[1]);
+
+
+            // Attach click event listener to the confirm button inside the modal
+            $("#delete__confirm-btn").off("click").on("click", function (event) {
+                event.preventDefault();
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'delete_course' %}",
+                    data: $("#delete__form").serialize(),
+                    success: function (response) {
+                        $("#notification-content").text(response["message"]);
+                        $("#notification-action").text("Redirecting ");
+                        Toastify({
+                            node: $("#notification").clone().removeClass("hidden")[0],
+                            duration: 3000,
+                            newWindow: true,
+                            close: true,
+                            gravity: "top",
+                            position: "right",
+                            stopOnFocus: true,
+                        }).showToast();
+
+                        setTimeout(function () {
+                            window.location.href = "{% url 'courses' %}";
+                        }, 3000);
+                    },
+                    error: function (response) {
+                        $("#notification-content").text(response.responseJSON.message);
+                        Toastify({
+                            node: $("#notification").clone().removeClass("hidden")[0],
+                            duration: 3000,
+                            newWindow: true,
+                            close: true,
+                            gravity: "top",
+                            position: "right",
+                            stopOnFocus: true,
+                        }).showToast();
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

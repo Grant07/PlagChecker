@@ -1,0 +1,383 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block content %}
+<div class="intro-y chat grid grid-cols-12 gap-5 mt-5" id="content">
+    <div class="col-span-12 lg:col-span-4 2xl:col-span-3">
+        {% if not data.with_id %}
+        <div class="intro-y pr-1">
+            <div class="box px-2 py-1.5">
+                <ul class="nav nav-pills" role="tablist">
+                    <li id="chats-tab" class="nav-item flex-1" role="presentation">
+                        <button class="nav-link w-full py-2 active" data-tw-toggle="pill" data-tw-target="#chats"
+                            type="button" role="tab" aria-controls="chats" aria-selected="true"> All </button>
+                    </li>
+                    <li id="friends-tab" class="nav-item flex-1" role="presentation">
+                        <button class="nav-link w-full py-2" data-tw-toggle="pill" data-tw-target="#friends"
+                            type="button" role="tab" aria-controls="friends" aria-selected="false"> Individual </button>
+                    </li>
+                    <li id="profile-tab" class="nav-item flex-1" role="presentation">
+                        <button class="nav-link w-full py-2" data-tw-toggle="pill" data-tw-target="#profile"
+                            type="button" role="tab" aria-controls="profile" aria-selected="false"> Group </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+        <div class="tab-content">
+            {% if data.with_id %}
+            <div id="profile" class="tab-pane active" role="tabpanel" aria-labelledby="profile-tab">
+                <div class="pr-1">
+                    <div class="box p-5">
+                        <div class="flex items-center border-b border-slate-200/60 dark:border-darkmode-400 pb-5">
+                            <div class="w-full">
+                                <div class="flex justify-between">
+                                    <div class="text-slate-500 mr-auto">Deadline</div>
+                                    <i data-lucide="clock-9" class="w-4 h-4 text-slate-500"></i> 
+                                </div>
+                                <div class="mt-1">{{ data.assignment.due_date }}</div>
+                            </div>
+                            
+                        </div>
+                        <div class="flex items-center border-b border-slate-200/60 dark:border-darkmode-400 py-5">
+                            <div class="w-full">
+                                <div class="flex justify-between">
+                                    <div class="text-slate-500">Status</div>
+                                    <i data-lucide="shield" class="w-4 h-4 text-slate-500 ml-auto"></i> 
+                                </div>
+                                <div class="mt-1 font-medium">
+                                    {% if data.assignment.status == "active" and data.submission.date_submitted %}
+                                        <span class="text-success">Active & Submitted</span>
+                                    {% elif data.assignment.status == "active" and not data.submission.date_submitted %}
+                                        <span class="text-success">Active</span><span class="text-warning"> & Not Submitted</span>
+                                    {% elif data.assignment.status == "inactive" and not data.submission.date_submitted %}
+                                        <span class="text-danger">Inactive & Not Submitted</span>
+                                    {% else %}
+                                        <span class="text-success">Inactive & Submitted</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                           
+                        </div>
+                        {% if data.submission_status.status == "marked" %}
+                        <div class="flex items-center border-b border-slate-200/60 dark:border-darkmode-400 py-5">
+                            <div class="w-full">
+                                <div class="flex justify-between">
+                                    <div class="text-slate-500">Score</div>
+                                    <i data-lucide="crosshair" class="w-4 h-4 text-slate-500 ml-auto"></i>
+                                </div>
+                                <div class="mt-1">
+                                    {{ data.submission_status.marks }} / {{ data.assignment.total}}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if data.submission_status.status != "marked" %}
+                        <div class="flex items-center border-b border-slate-200/60 dark:border-darkmode-400 py-5">
+                            <div class="w-full">
+                                <div class="flex justify-between">
+                                    <div class="text-slate-500">{% if data.submission.date_submitted %}Reupload{% else %}Upload{% endif %} Assignment</div>
+                                    <i data-lucide="save" class="w-4 h-4 text-slate-500 ml-auto"></i> 
+                                </div>
+                                <form method="POST" enctype="multipart/form-data" id="upload__form">
+                                    {% csrf_token %}
+                                    <div class="mt-1 py-1">
+                                        <input type="hidden" value="{{ data.assignment.id }}" name="upload__form__input_assignment__id" />
+                                        <input type="hidden" name="next" value="{{ request.path }}">
+                                        <label>
+                                            <input type="file" class="text-sm text-grey-500
+                                            file:mr-5 file:py-2 file:px-6
+                                            file:rounded-md file:border-0
+                                            file:text-sm file:font-medium
+                                            file:bg-blue-50 file:text-blue-700
+                                            hover:file:cursor-pointer hover:file:bg-amber-50
+                                            hover:file:text-amber-700 w-full" accept="application/pdf, application/msword" id="upload__form__input" name="upload__form__input"/>
+                                        </label>
+                                    </div>
+                                </form>                              
+                            </div>
+                        </div>
+                        <div class="flex items-center border-b border-slate-200/60 dark:border-darkmode-400 py-5">
+                            <div class="w-full">
+                                <button type="button" class="btn btn-outline-primary hover:btn-primary w-full" id="upload__form__submit">
+                                    <span class="mx-2 hidden sm:inline">Submit</span>
+                                    <i data-lucide="send" class="text-primary h-6"></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% endif %} 
+                    </div>
+                    <div class="box px-5 py-5 mt-5">
+                        <div class="flex flex-col justify-start mx-auto">
+                            <div class="text-secondary font-medium text-lg">Feedback</div>
+                            <div class="border-t border-slate-200/60 dark:border-darkmode-400 mt-3"></div>
+                        </div>
+                        <div class="mt-3">
+                            <textarea class="form-control p-5 disabled" rows="8" style="resize: none;">{% if data.submission_status.feedback %}{{ data.submission_status.feedback }}{% else %}No Feedback{% endif %}</textarea>
+                            <div class="border-t border-slate-200/60 dark:border-darkmode-400 mt-3"></div>
+                            <div class="flex justify-start mt-3">
+                                <div class="text-slate-400 font-medium">Commentator: &nbsp;</div>
+                                <div class="text-secondary">{% if data.submission_status.feedback %}{{ data.submission_status.commentator }}{% else %}No Commentator{% endif %}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div id="chats" class="tab-pane active" role="tabpanel" aria-labelledby="chats-tab">
+                <div class="chat__chat-list overflow-y-auto scrollbar-hidden pr-1 pt-1 mt-4">
+                    {% if data.assignments|length > 0 %}
+                    {% for assignment in data.assignments %}
+                    <div class="intro-x cursor-pointer box relative flex items-center px-5 py-3 mb-2">
+                        <div class="w-12 h-12 flex-none image-fit mr-1">
+                            <div class="hidden" id="file">
+                                {{ assignment.id }}
+                            </div>
+                            <img alt="Midone - HTML Admin Template" class="rounded-full"
+                                src="data:image/*;base64,{{ assignment.lecturer.user.image.decode }}">
+                            <div
+                                class="w-3 h-3 bg-success absolute right-0 bottom-0 rounded-full border-2 border-white dark:border-darkmode-600">
+                            </div>
+                        </div>
+                        <div class="ml-2 overflow-hidden">
+                            <div class="flex items-center">
+                                <a href="javascript:;" class="font-medium w-full">{{ assignment.title }}</a>
+                            </div>
+                            <div class="w-full truncate text-slate-500 mt-0.5">Deadline: {{ assignment.due_date }}</div>
+                        </div>
+                        <div class="flex justify-end ml-auto">
+                            <button id="toAssignment">
+                                <a href="{% url 'get_assignment_uuid' course_code=data.course_code assignmnet_id=assignment.id %}" class="p-5 -mx-10"><i data-lucide="more-vertical" class="w-6 h-6 text-secondary"></i></a>
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            <div id="friends" class="tab-pane" role="tabpanel" aria-labelledby="friends-tab">
+                <div class="chat__chat-list overflow-y-auto scrollbar-hidden pr-1 pt-1 mt-4">
+                    {% for assignment in data.assignments %}
+                    {% if assignment.is_group_assignment == False %}
+                    <div class="intro-x cursor-pointer box relative flex items-center p-5 mb-2">
+                        <div class="w-12 h-12 flex-none image-fit mr-1">
+                            <div class="hidden" id="file">
+                                {{ assignment.id }}
+                            </div>
+                            <img alt="Midone - HTML Admin Template" class="rounded-full"
+                                src="data:image/*;base64,{{ assignment.lecturer.user.image.decode }}">
+                            <div
+                                class="w-3 h-3 bg-success absolute right-0 bottom-0 rounded-full border-2 border-white dark:border-darkmode-600">
+                            </div>
+                        </div>
+                        <div class="ml-2 overflow-hidden">
+                            <div class="flex items-center">
+                                <a href="javascript:;" class="font-medium">{{ assignment.title}}</a>
+                            </div>
+                            <div class="w-full truncate text-slate-500 mt-0.5">Deadline: {{ assignment.due_date }}</div>
+                        </div>
+                        <div class="flex justify-end ml-auto">
+                            <button id="toAssignment">
+                                <a href="{% url 'get_assignment_uuid' course_code=data.course_code assignmnet_id=assignment.id %}" class="p-5 -mx-10"><i data-lucide="more-vertical" class="w-6 h-6 text-secondary"></i></a>
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            <div id="profile" class="tab-pane" role="tabpanel" aria-labelledby="profile-tab">
+                <div class="chat__chat-list overflow-y-auto scrollbar-hidden pr-1 pt-1 mt-4">
+                    {% for assignment in data.assignments %}
+                    {% if assignment.is_group_assignment %}
+                    <div class="intro-x cursor-pointer box relative flex items-center p-5 mb-2">
+                        <div class="w-12 h-12 flex-none image-fit mr-1">
+                            <div class="hidden" id="file">
+                                {{ assignment.id }}
+                            </div>
+                            <img alt="Midone - HTML Admin Template" class="rounded-full"
+                                src="data:image/*;base64,{{ assignment.lecturer.user.image.decode }}">
+                            <div
+                                class="w-3 h-3 bg-success absolute right-0 bottom-0 rounded-full border-2 border-white dark:border-darkmode-600">
+                            </div>
+                        </div>
+                        <div class="ml-2 overflow-hidden">
+                            <div class="flex items-center">
+                                <a href="javascript:;" class="font-medium">{{ assignment.title }}</a>
+                            </div>
+                            <div class="w-full truncate text-slate-500 mt-0.5">Deadline: {{ assignment.due_date }}</div>
+                        </div>
+                        <div class="flex justify-end ml-auto">
+                            <button id="toAssignment">
+                                <a href="{% url 'get_assignment_uuid' course_code=data.course_code assignmnet_id=assignment.id %}" class="p-5 -mx-10"><i data-lucide="more-vertical" class="w-6 h-6 text-secondary"></i></a>
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="intro-y col-span-12 lg:col-span-8 2xl:col-span-9 hidden md:block">
+        <div class="chat__box chat h-full">
+            <div class="{% if not data.with_id %} hidden {% endif %} flex flex-col h-full w-full">
+                <div class="flex flex-col sm:flex-row px-5 overflow-y-scroll scrollbar-hidden h-full">
+                    {% if not data.with_id %}
+                    <div class="flex flex-col mx-auto my-auto" id="loading">
+                        <div class="loader"></div>
+                    </div>
+                    {% endif %}
+                    {% if data.with_id and not data.submission.date_submitted %}
+                        <iframe id="canvas" class="w-full rounded-lg" src="data:application/pdf;base64,{{ data.assignment.file.decode }}"></iframe>
+                    {% elif data.with_id and data.submission.date_submitted %}
+                        <iframe id="canvas" class="w-full rounded-lg" src="data:application/pdf;base64,{{ data.submission.file.decode }}"></iframe>
+                    {% else %}
+                        <iframe id="canvas" class="-intro-x w-full rounded-lg hidden"></iframe>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="{% if data.with_id %} hidden {% endif %} h-full flex items-center">
+                <div class="mx-auto text-center">
+                    <div class="w-16 h-16 flex-none image-fit rounded-full overflow-hidden mx-auto">
+                        <img alt="Midone - HTML Admin Template" src="data:image/*;base64,{{ request.user.image.decode }}">
+                    </div>
+                    <div class="mt-3">
+                        <div class="font-medium">Hey, {{ request.user.get_full_name }}</div>
+                        <div class="text-slate-500 mt-1">Select Assignment to View</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="flex justify-center my-auto mx-auto fixed z-50 top-0 bottom-0 right-0 left-0 hidden" id="loader">
+    <div class="loader"></div>
+</div>
+{% endblock%}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        $('#upload__form__submit').click(function(){
+            {% if data.with_id %}
+            // Create a FormData object
+            var formData = new FormData();
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+            // Append file input to FormData
+            formData.append('upload__form__input', $('#upload__form__input')[0].files[0]);
+
+            $("#content").addClass("blur");
+            $("#loader").removeClass("hidden");
+
+
+            // Send the AJAX request
+            $.ajax({
+                type: "POST",
+                url: "{% url 'submit_assignment' course_code=data.course_code assignment_id=data.assignment.id %}",
+                data: formData,
+                processData: false,  // Prevent jQuery from processing the data
+                contentType: false,  // Prevent jQuery from setting contentType
+                success: function (response) {
+                    $("#content").removeClass("blur");
+                    $("#loader").addClass("hidden");
+
+                    $("#notification-content").text(response["message"]);
+                    $("#notification-action").text("Refreshing ");
+                    Toastify({
+                        node: $("#notification").clone().removeClass("hidden")[0],
+                        duration: 3000,
+                        newWindow: true,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        stopOnFocus: true,
+                    }).showToast();
+
+                    setTimeout(function () {
+                        window.location.href = "{{ request.path }}";
+                    }, 3000)
+                    
+                },
+                error: function (response) {
+                    $("#notification-content").text(response.responseJSON.message);
+                    Toastify({
+                        node: $("#notification").clone().removeClass("hidden")[0],
+                        duration: 3000,
+                        newWindow: true,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        stopOnFocus: true,
+                    }).showToast();
+                }
+            });
+            {% endif %}
+        })
+
+        $("#assignment__form-btn").click(function () {
+            submitAssignmentForm();
+        })
+
+        // Add click event listener to assignment elements
+        $('.intro-x.cursor-pointer.box').click(function() {
+            // Get iframe element
+            var iframe = $('#canvas');
+
+            // Function to show loading animation
+            function showLoadingAnimation() {
+                $('#loading').removeClass('hidden');
+                iframe.addClass('hidden');
+            }
+
+            // Function to hide loading animation
+            function hideLoadingAnimation() {
+                $('#loading').addClass('hidden');
+                iframe.removeClass('hidden');
+            }
+
+            // Get content and file from data attributes of clicked assignment
+            var file_id = $(this).find('#file').text().trim();
+
+            $.ajax({
+                type: "GET",
+                url: "{% url 'get_file' %}",
+                data: {
+                    file_id: file_id,
+                    file_type: "assignment"
+                },
+                success: function (response) {
+                    var file = response["file"];
+
+                    iframe.attr('src', 'data:application/pdf;base64,' + file);
+                    showLoadingAnimation();
+                    setInterval(hideLoadingAnimation, 3000);
+                },
+                error: function (response) {
+                    $("#notification-content").text(response.responseJSON.message);
+                    Toastify({
+                        node: $("#notification").clone().removeClass("hidden")[0],
+                        duration: 3000,
+                        newWindow: true,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        stopOnFocus: true,
+                    }).showToast();
+                }
+            });
+        })
+
+        $('#toAssignment').on("click", function(event){
+            event.preventDefault();
+            event.stopPropagation();
+
+            window.location.href = $(this).find("a").attr("href");
+
+        })
+    
+    });
+</script>
+{% endblock%}

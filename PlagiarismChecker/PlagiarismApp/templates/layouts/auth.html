@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<!--
+Template Name: Tinker - HTML Admin Dashboard Template
+Author: Left4code
+Website: http://www.left4code.com/
+Contact: muhammadrizki@left4code.com
+Purchase: https://themeforest.net/user/left4code/portfolio
+Renew Support: https://themeforest.net/user/left4code/portfolio
+License: You must have a valid license purchased only from themeforest(the above link) in order to legally use the theme for your project.
+-->
+{% load static %}
+<html lang="en" class="light">
+    <!-- BEGIN: Head -->
+    {% include 'partials/header.html' %}
+    <!-- END: Head -->
+    <body class="login">
+        <div id="notification" class="toastify-content hidden flex">
+            <div class="font-medium" id="notification-content"></div>
+            <a class="font-medium text-primary dark:text-slate-400 mt-1 sm:mt-0 sm:ml-40" href="" id="notification-action"></a>
+        </div>
+        {% block content %}
+        {% endblock %}
+         <!-- BEGIN: Dark Mode Switcher-->
+         {% include 'components/dark_mode_switcher.html' %}
+         <!-- END: Dark Mode Switcher-->
+        
+        {% include 'partials/footer.html' %}
+        {% block scripts %}
+        {% endblock %}
+    </body>
+</html>

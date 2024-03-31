@@ -1,0 +1,62 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block content %}
+<div class="grid grid-cols-12 gap-6 mt-5">
+    {% for year_courses in curriculum %}
+    {% for year, semesters in year_courses.items %}
+    {% for semester, courses in semesters.items %}
+    <div class="intro-y col-span-12 md:col-span-6">
+        <div class="intro-y">
+            <div class="flex items-center p-4 border-b border-slate-200/60">
+                <h2 class="font-medium text-base mr-auto">
+                    {{ year }}
+                </h2>
+                <div class="font-medium text-base ml-auto">
+                    Semester {{ semester }}
+                </div>
+            </div>
+            <div class="p-5">
+                <div class="">
+                    <table class="table table-report mt-2" id="curriculum-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="whitespace-nowrap">#</th>
+                                <th class="whitespace-nowrap">Code</th>
+                                <th class="whitespace-nowrap">Name</th>
+                                <th class="whitespace-nowrap">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for course in courses %}
+                            <tr class="zoom-in">
+                                <td class="whitespace-nowrap w-10">{{ forloop.counter }}</td>
+                                <td class="whitespace-nowrap w-10">{{ course.course_code }}</td>
+                                <td class="whitespace-nowrap">{{ course.course_name }}</td>
+                                <td class="whitespace-nowrap w-10">{{ course.course_status }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endfor %}
+    {% endfor %}
+</div>
+{% endblock%}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+
+        var tabledata = {{ curriculum|safe }};
+
+        var table = new Tabulator("#curriculum-table", {
+            data: tabledata,
+            autoColumns: true,
+        });
+    });
+</script>
+{% endblock %}

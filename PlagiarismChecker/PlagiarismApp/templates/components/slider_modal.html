@@ -1,0 +1,168 @@
+<div id="{{ data.modal.id }}" class="modal modal-slide-over" data-tw-backdrop="static" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content"> 
+            <a data-tw-dismiss="modal" href="javascript:;"> 
+                <i data-lucide="x" class="w-8 h-8 text-slate-400"></i> 
+            </a> 
+            <!-- BEGIN: Slide Over Header -->
+            <div class="modal-header bg-amber-50">
+                <h2 class="font-medium text-base mr-auto">Add {{ data.modal.title }}</h2>
+            </div>
+            <!-- END: Slide Over Header -->
+            <!-- BEGIN: Slide Over Body -->
+            <form method="POST" id="add__form">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="absolute z-50 my-[22rem] mx-[11rem] w-full flex flex-col hidden" id="loading">
+                        <div class="loader intro-y"></div>
+                        <div class="font-medium text-slate-500 mt-2 -ml-3 intro-x">Please Wait ...</div>
+                    </div>
+                    {% if 'admin/programs' in request.path %}
+                    <div>
+                        <label for="program__name" class="form-label">Program Name</label>
+                        <input id="program__name" type="text" class="form-control" placeholder="BSc. Computer Science" name="program__name">
+                    </div>
+                    <div class="mt-3">
+                        <label for="program__department" class="form-label">Program Department</label>
+                        <select id="program__department" class="form-select w-full" name="program__department">
+                            <option>Select Department Below</option>
+                            {% for department in data.departments %}
+                                <option value="{{ department.name }}">{{ department.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mt-3">
+                        <label for="program__duration" class="form-label">Program Duration</label>
+                        <input id="program__duration" type="number" class="form-control" placeholder="3" name="program__duration" min="2" max="5">
+                    </div>
+                    
+                    {% elif 'admin/courses' in request.path %}
+                    <div class="mt-3">
+                        <label for="course__name" class="form-label"> Course Name</label>
+                        <input id="course__name" type="text" class="form-control" placeholder="Course Name"
+                            name="course__name">
+                    </div>
+                    <div class="mt-3">
+                        <label for="course__code" class="form-label"> Course Code</label>
+                        <input id="course__code" type="text" class="form-control" placeholder="Course Code"
+                            name="course__code">
+                    </div>
+                    <div class="mt-3">
+                        <label for="course__credits" class="form-label"> Credits</label>
+                        <input id="course__credits" type="text" class="form-control" placeholder="Credits"
+                            name="course__credits">
+                    </div>
+                    <div class="mt-3">
+                        <label for="course__semester" class="form-label">Semester</label>
+                        <select id="course__semester" class="tom-select w-full" name="course__semester">
+                            <option>Select Semister Below</option>
+                            <option value="Semester I">Semester I</option>
+                            <option value="Semester II">Semester II</option>
+                        </select>
+                    </div>
+
+                    <div class="mt-3">
+                        <label for="course__programs" class="form-label">Program</label>
+                        <select id="course__programs" class="tom-select w-full" name="course__programs" data-placeholder="Program Name" multiple>
+                            {% for program in data.programs %}
+                                <option value="{{ program.id}}">{{ program.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% elif 'admin/lecturers' in request.path %}
+                    <div class="mt-3">
+                        <label for="employee__id" class="form-label">Employee ID</label>
+                        <div class="flex">
+                            <div class="z-30 rounded-l w-10 flex items-center justify-center bg-slate-100 border text-slate-500 dark:bg-darkmode-700 dark:border-darkmode-800 dark:text-slate-400 -mr-1">
+                                #
+                            </div>
+                            <input id="employee__id" type="text" class="form-control" placeholder="E/UDOM/2019/001" name="employee__id">
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label for="first__name" class="form-label">First Name</label>
+                        <div class="flex">
+                            <div class="z-30 rounded-l w-10 flex items-center justify-center bg-slate-100 border text-slate-500 dark:bg-darkmode-700 dark:border-darkmode-800 dark:text-slate-400 -mr-1">
+                                Aa
+                            </div>
+                            <input id="first__name" type="text" class="form-control" placeholder="John" name="first__name">
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label for="last__name" class="form-label">Last Name</label>
+                        <div class="flex">
+                            <div class="z-30 rounded-l w-10 flex items-center justify-center bg-slate-100 border text-slate-500 dark:bg-darkmode-700 dark:border-darkmode-800 dark:text-slate-400 -mr-1">
+                                Zz
+                            </div>
+                            <input id="last__name" type="text" class="form-control" placeholder="Doe" name="last__name">
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label for="department__name" class="form-label">Department</label>
+                        <div class="flex">
+                            <div class="z-30 rounded-l w-10 flex items-center justify-center bg-slate-100 border text-slate-500 dark:bg-darkmode-700 dark:border-darkmode-800 dark:text-slate-400 -mr-1">
+                                <i data-lucide="home" class="w-4 h-4"></i>
+                            </div>
+                            <select id="department__name" class="form-select" name="department__name">
+                                <option>Select Department</option>
+                                {% for department in data.departments %}
+                                <option value="{{ department.id }}">{{ department.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label for="course__names" class="form-label">Courses</label>
+                        <div class="flex">
+                            <div class="z-30 rounded-l w-10 flex items-center justify-center bg-slate-100 border text-slate-500 dark:bg-darkmode-700 dark:border-darkmode-800 dark:text-slate-400 -mr-1">
+                                <i data-lucide="book-open" class="w-4 h-4"></i>
+                            </div>
+                            <select id="course__names" class="tom-select w-full" name="lecturer__courses" data-placeholder="Course Name" multiple>
+                                {% for course in data.courses %}
+                                <option value="{{ course.id }}">{{ course.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                </div>
+                <!-- END: Slide Over Body -->
+                {% endif %}
+                <!-- BEGIN: Slide Over Footer -->
+                <div class="modal-footer w-full absolute bottom-0 left-0"> 
+                    <button data-tw-dismiss="modal" class="btn btn-outline-secondary mr-1">Cancel</button> 
+                    <button class="btn btn-primary" id="add__form-btn">Register</button> 
+                </div>
+                <!-- END: Slide Over Footer -->
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Model Zinazofanya Kazi -->
+
+<div id="button-slide-over-preview" class="modal modal-slide-over" data-tw-backdrop="static" tabindex="-1"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <a data-tw-dismiss="modal" href="javascript:;"> <i data-lucide="x" class="w-8 h-8 text-slate-400"></i> </a>
+            <div class="modal-header p-5">
+                <h2 class="font-medium text-base mr-auto">
+                    Fill the details Below
+                </h2>
+            </div>
+            <div class="modal-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+
+
+                    <button class="btn btn-primary mt-5" type="submit">Save Details</button>
+
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
