@@ -1,0 +1,339 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block content %}
+<div class="intro-y chat grid grid-cols-12 gap-5 mt-5">
+    <div class="col-span-12 lg:col-span-4 2xl:col-span-3">
+        {% if data.submissions|length > 0 %}
+        <div class="intro-y pr-1">
+            <div class="box px-2 py-1.5">
+                <ul class="nav nav-pills" role="tablist">
+                    <li id="chats-tab" class="nav-item flex-1" role="presentation">
+                        <button class="nav-link w-full py-2 active" data-tw-toggle="pill" data-tw-target="#chats"
+                            type="button" role="tab" aria-controls="chats" aria-selected="true"> All </button>
+                    </li>
+                    <li id="friends-tab" class="nav-item flex-1" role="presentation">
+                        <button class="nav-link w-full py-2" data-tw-toggle="pill" data-tw-target="#friends"
+                            type="button" role="tab" aria-controls="friends" aria-selected="false"> Individual </button>
+                    </li>
+                    <li id="profile-tab" class="nav-item flex-1" role="presentation">
+                        <button class="nav-link w-full py-2" data-tw-toggle="pill" data-tw-target="#profile"
+                            type="button" role="tab" aria-controls="profile" aria-selected="false"> Group </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+        <div class="tab-content">
+            {% if data.submissions|length != 0 %}
+            <div id="chats" class="tab-pane active" role="tabpanel" aria-labelledby="chats-tab">
+                <div class="chat__chat-list overflow-y-auto scrollbar-hidden pr-1 pt-1 mt-4">
+                    {% if data.submissions|length > 0 %}
+                    {% for submission in data.submissions %}
+                    <div class="intro-x cursor-pointer box relative flex items-center px-5 py-3 mb-2">
+                        <div class="w-12 h-12 flex-none image-fit mr-1">
+                            <div class="hidden" id="file">
+                                {{ submission.id }}
+                            </div>
+                            <img alt="Midone - HTML Admin Template" class="rounded-full"
+                                src="data:image/*;base64,{{ submission.student.user.image.decode }}">
+                            <div
+                                class="w-3 h-3 bg-success absolute right-0 bottom-0 rounded-full border-2 border-white dark:border-darkmode-600">
+                            </div>
+                        </div>
+                        <div class="ml-2 overflow-hidden">
+                            <div class="flex items-center">
+                                <a href="javascript:;" class="font-medium w-full">{{ submission.student.user.get_full_name }}</a>
+                            </div>
+                            <div class="w-full truncate text-slate-500 mt-0.5">Submitted: {{ submission.date_submitted }}</div>
+                        </div>
+                        <div class="flex justify-end ml-auto">
+                            <button id="toAssignment">
+                                <a href="{% url 'get_submission_with_id' submission_id=submission.id%}" class="p-5 -mx-10"><i data-lucide="more-vertical" class="w-6 h-6 text-secondary"></i></a>
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            <div id="friends" class="tab-pane" role="tabpanel" aria-labelledby="friends-tab">
+                <div class="chat__chat-list overflow-y-auto scrollbar-hidden pr-1 pt-1 mt-4">
+                    {% if data.submissions|length > 0 %}
+                    {% for submission in data.submissions %}
+                    {% if submission.assignment.is_group_assignment == False %}
+                    <div class="intro-x cursor-pointer box relative flex items-center px-5 py-3 mb-2">
+                        <div class="w-12 h-12 flex-none image-fit mr-1">
+                            <div class="hidden" id="file">
+                                {{ submission.id }}
+                            </div>
+                            <img alt="Midone - HTML Admin Template" class="rounded-full"
+                                src="data:image/*;base64,{{ submission.student.user.image.decode }}">
+                            <div
+                                class="w-3 h-3 bg-success absolute right-0 bottom-0 rounded-full border-2 border-white dark:border-darkmode-600">
+                            </div>
+                        </div>
+                        <div class="ml-2 overflow-hidden">
+                            <div class="flex items-center">
+                                <a href="javascript:;" class="font-medium w-full">{{ submission.student.user.get_full_name }}</a>
+                            </div>
+                            <div class="w-full truncate text-slate-500 mt-0.5">Submitted: {{ submission.date_submitted }}</div>
+                        </div>
+                        <div class="flex justify-end ml-auto">
+                            <button id="toAssignment">
+                                <a href="{% url 'get_submission_with_id' submission_id=submission.id%}" class="p-5 -mx-10"><i data-lucide="more-vertical" class="w-6 h-6 text-secondary"></i></a>
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            <div id="profile" class="tab-pane" role="tabpanel" aria-labelledby="profile-tab">
+                <div class="chat__chat-list overflow-y-auto scrollbar-hidden pr-1 pt-1 mt-4">
+                    {% if data.submissions|length > 0 %}
+                    {% for submission in data.submissions %}
+                    {% if submission.assignment.is_group_assignment %}
+                    <div class="intro-x cursor-pointer box relative flex items-center px-5 py-3 mb-2">
+                        <div class="w-12 h-12 flex-none image-fit mr-1">
+                            <div class="hidden" id="file">
+                                {{ submission.id }}
+                            </div>
+                            <img alt="Midone - HTML Admin Template" class="rounded-full"
+                                src="data:image/*;base64,{{ submission.student.user.image.decode }}">
+                            <div
+                                class="w-3 h-3 bg-success absolute right-0 bottom-0 rounded-full border-2 border-white dark:border-darkmode-600">
+                            </div>
+                        </div>
+                        <div class="ml-2 overflow-hidden">
+                            <div class="flex items-center">
+                                <a href="javascript:;" class="font-medium w-full">{{ submission.student.user.get_full_name }}</a>
+                            </div>
+                            <div class="w-full truncate text-slate-500 mt-0.5">Submitted: {{ submission.date_submitted }}</div>
+                        </div>
+                        <div class="flex justify-end ml-auto">
+                            <button id="toAssignment">
+                                <a href="{% url 'get_submission_with_id' submission_id=submission.id%}" class="p-5 -mx-10"><i data-lucide="more-vertical" class="w-6 h-6 text-secondary"></i></a>
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <div id="profile" class="tab-pane active" role="tabpanel" aria-labelledby="profile-tab">
+                <div class="pr-1">
+                    <div class="box p-5">
+                        <div class="flex items-center pb-5">
+                            <div class="w-full">
+                                <div class="text-secondary font-medium text-lg">Feedback</div>
+                            </div>
+                            
+                        </div>
+                        <div class="flex items-center border-b border-slate-200/60 dark:border-darkmode-400 pb-5">
+                            <div class="w-full">
+                                <div class="flex justify-between">
+                                    <div class="text-slate-500 mr-auto">Submission Date</div>
+                                    <i data-lucide="clock-9" class="w-4 h-4 text-slate-500"></i> 
+                                </div>
+                                <div class="mt-1">{{ data.submissions.date_submitted }}</div>
+                            </div>
+                            
+                        </div>
+                        <div class="flex items-center border-b border-slate-200/60 dark:border-darkmode-400 py-5">
+                            <div class="w-full">
+                                <div class="flex justify-between">
+                                    <div class="text-slate-500">Plagiarism Score</div>
+                                    <i data-lucide="crosshair" class="w-4 h-4 text-slate-500 ml-auto"></i>
+                                </div>
+                                <div class="mt-1 w-full">
+                                    {% if data.plagiarism_percentage is not None %}
+                                    <a href="{% url 'get_plagiarism_report_for_submission' submission_id=data.submissions.id%}" class="flex flex-row justify-between m-2">
+                                        <div class="font-medium mr-auto">{{ data.plagiarism_percentage }} %</div>
+                                        <div class="text-slate-500">
+                                            <i data-lucide="arrow-right" class="w-4 h-4 text-slate-500"></i>
+                                        </div>
+                                    </a>
+                                    {% else %}
+                                    <div class="flex flex-row justify-between mt-2">
+                                        <div class="font-medium mr-auto">Plagiarism Detection Disabled</div>
+                                        <div class="text-slate-500">
+                                            <i data-lucide="x" class="w-4 h-4 text-slate-500"></i>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <form method="POST" id="return__assignment__form">
+                            {% csrf_token %}
+                            <div class="flex items-center py-5">
+                                <div class="w-full">
+                                    <div class="flex justify-between">
+                                        <div class="text-slate-500">Assignment Score</div>
+                                        <i data-lucide="crosshair" class="w-4 h-4 text-slate-500 ml-auto"></i>
+                                    </div>
+                                    <div class="py-5 mt-1">
+                                        <input class="form-control" type="number" min="0" max="{{ data.submissions.assignment.total }}" placeholder="Maximum: {{ data.submissions.assignment.total }}" name="return__assignment__form__score"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center border-b border-slate-200/60 dark:border-darkmode-400 py-5">
+                                <div class="w-full">
+                                    <div class="py-5 mt-1">
+                                        <div class="flex flex-col justify-start mx-auto">
+                                            <div class="text-secondary font-medium text-lg">Feedback</div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <textarea class="form-control pl-3 pt-3" rows="8" style="resize: none;" placeholder="{% if data.submission_status.feedback %}{{ data.submission_status.feedback }}{% else %}No Feedback Yet{% endif %}" name="return__assignment__form__feedback"></textarea>
+                                            <div class="border-t border-slate-200/60 dark:border-darkmode-400 mt-3"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-1 py-1">
+                                        <input type="hidden" name="return__assignment__form__id" value="{{ data.submissions.id }}">
+                                        <button type="button" class="btn btn-outline-primary hover:btn-primary w-full" id="return__assignment__form__submit">Submit</button>
+                                    </div>                            
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="intro-y col-span-12 lg:col-span-8 2xl:col-span-9 hidden md:block">
+        <div class="chat__box chat h-full">
+            <div class="{% if data.submissions|length > 0 %} hidden {% endif %} flex flex-col h-full w-full">
+                <div class="flex flex-col sm:flex-row px-5 overflow-y-scroll scrollbar-hidden h-full">
+                    {% if data.submissions|length > 0 %}
+                    <div class="flex flex-col mx-auto my-auto" id="loading">
+                        <div class="loader"></div>
+                    </div>
+                    {% endif %}
+                    {% if data.submissions|length == 0 and not data.submissions.date_submitted %}
+                        <iframe id="canvas" class="w-full rounded-lg" src="data:application/pdf;base64,{{ data.assignment.file.decode }}"></iframe>
+                    {% elif data.submissions|length == 0 and data.submissions.date_submitted %}
+                        <iframe id="canvas" class="w-full rounded-lg" src="data:application/pdf;base64,{{ data.submissions.file.decode }}"></iframe>
+                    {% else %}
+                    <iframe id="canvas" class="-intro-x w-full rounded-lg hidden"></iframe>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="{% if data.submissions|length == 0 %} hidden {% endif %} h-full flex items-center">
+                <div class="mx-auto text-center">
+                    <div class="w-16 h-16 flex-none image-fit rounded-full overflow-hidden mx-auto">
+                        <img alt="Midone - HTML Admin Template" src="data:image/*;base64,{{ request.user.image.decode }}">
+                    </div>
+                    <div class="mt-3">
+                        <div class="font-medium">Hey, {{ request.user.get_full_name }}</div>
+                        <div class="text-slate-500 mt-1">Select Submission to View</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock%}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        $('#return__assignment__form__submit').on("click", function(){
+            $.ajax({
+                type: "POST",
+                url: "{% url 'return_assignment' submission_id=data.with_id %}",
+                data: $("#return__assignment__form").serialize(),
+                success: function (response) {
+                    $("#notification-content").text(response["message"]);
+                    Toastify({
+                        node: $("#notification").clone().removeClass("hidden")[0],
+                        duration: 3000,
+                        newWindow: true,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        stopOnFocus: true,
+                    }).showToast();
+
+                    setTimeout(function () {
+                        window.location.href = "{% url 'get_all_submissions' %}";
+                    }, 3000);
+                },
+                error: function (response) {
+                    $("#notification-content").text(response.responseJSON.message);
+                    Toastify({
+                        node: $("#notification").clone().removeClass("hidden")[0],
+                        duration: 3000,
+                        newWindow: true,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        stopOnFocus: true,
+                    }).showToast();
+                }
+            })
+        });
+
+        // Add click event listener to assignment elements
+        $('.intro-x.cursor-pointer.box').click(function() {
+            // Get iframe element
+            var iframe = $('#canvas');
+
+            // Function to show loading animation
+            function showLoadingAnimation() {
+                $('#loading').removeClass('hidden');
+                iframe.addClass('hidden');
+            }
+
+            // Function to hide loading animation
+            function hideLoadingAnimation() {
+                $('#loading').addClass('hidden');
+                iframe.removeClass('hidden');
+            }
+
+            // Get content and file from data attributes of clicked assignment
+            var file_id = $(this).find('#file').text().trim();
+
+            $.ajax({
+                type: "GET",
+                url: "{% url 'get_file' %}",
+                data: {
+                    file_id: file_id,
+                    file_type: "submission"
+                },
+                success: function (response) {
+                    var file = response["file"];
+
+                    iframe.attr('src', 'data:application/pdf;base64,' + file);
+                    showLoadingAnimation();
+                    setInterval(hideLoadingAnimation, 3000);
+                },
+                error: function (response) {
+                    $("#notification-content").text(response.responseJSON.message);
+                    Toastify({
+                        node: $("#notification").clone().removeClass("hidden")[0],
+                        duration: 3000,
+                        newWindow: true,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        stopOnFocus: true,
+                    }).showToast();
+                }
+            });
+        })
+    
+        $('#toAssignment').on("click", function(event){
+            event.preventDefault();
+            event.stopPropagation();
+
+            window.location.href = $(this).find("a").attr("href");
+
+        })
+    
+    });
+</script>
+{% endblock%}

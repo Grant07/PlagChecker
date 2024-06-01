@@ -1,0 +1,217 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block content %}
+<!-- BEGIN: Content -->
+<div class="grid grid-cols-12 gap-6">
+    <div class="col-span-12 2xl:col-span-9">
+        <div class="grid grid-cols-12 gap-6">
+            <!-- BEGIN: General Report -->
+            <div class="col-span-12 mt-8">
+                <div class="intro-y flex items-center h-10 w-full">
+                    <h2 class="font-medium mr-auto rounded-full bg-primary py-1 px-3 text-white">{{ data.academic_year }}
+                    </h2>
+                    <nav data-controller="tabs" data-tabs-index-value="0" class="mx-auto ">
+                        <ul class="nav nav-pills border border-slate-300 dark:border-darkmode-300 border-dashed rounded-md p-1"
+                            role="tablist">
+                            <li id="weekly-report-tab" class="nav-item flex-1" role="presentation">
+                                <button class="nav-link w-full py-1.5 px-4 active" data-tw-toggle="pill"
+                                    data-tw-target="#weekly-report" type="button" role="tab"
+                                    aria-controls="weekly-report" aria-selected="true"> <span class="md:inline hidden">Semester&nbsp;</span>I </button>
+                            </li>
+                            <li id="monthly-report-tab" class="nav-item flex-1" role="presentation">
+                                <button class="nav-link w-full py-1.5 px-4" data-tw-toggle="pill"
+                                    data-tw-target="#monthly-report" type="button" role="tab" aria-selected="false"> <span class="md:inline hidden">Semester&nbsp;</span>II
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                    <a href="" class="ml-auto flex items-center text-primary ml-auto"> <i data-lucide="refresh-ccw"
+                            class="w-4 h-4 mr-3"></i> Refresh </a>
+                </div>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="weekly-report" role="tabpanel" aria-labelledby="weekly-report-tab">
+                        <div class="grid grid-cols-12 gap-6 mt-5">
+                            {% for course in data.courses %}
+                                {% if course.semester == "I" %}
+                                    {% with course.credits|add:0 as credits %}
+                                        <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
+                                            <a href="{% url 'all_assignments' course.code %}">
+                                                <div class="report-box zoom-in">
+                                                    <div class="box p-5">
+                                                        <div class="flex">
+                                                            <i data-lucide="book-open" class="report-box__icon text-primary"></i>
+                                                            <div class="ml-auto p-2">
+                                                                <div class="report-box__indicator 
+                                                                    {% if credits < 5 %}
+                                                                        bg-success
+                                                                    {% elif credits >= 5 and credits <= 9 %}
+                                                                        bg-warning
+                                                                    {% else %}
+                                                                        bg-danger
+                                                                    {% endif %}
+                                                                    tooltip cursor-pointer">
+                                                                    {{ credits }} <span class="pr-1"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="text-3xl font-medium leading-8 mt-6">{{ course.code }}</div>
+                                                        <div class="text-base text-slate-500 mt-1">{{ course.name }}</div>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    {% endwith %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="monthly-report" role="tabpanel" aria-labelledby="monthly-report-tab">
+                        <div class="grid grid-cols-12 gap-6 mt-5">
+                            {% for course in data.courses %}
+                                {% if course.semester == "II" %}
+                                    {% with course.credits|add:0 as credits %}
+                                        <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
+                                            <a href="/assignments/{{ course.code }}">
+                                                <div class="report-box zoom-in">
+                                                    <div class="box p-5">
+                                                        <div class="flex">
+                                                            <i data-lucide="book-open" class="report-box__icon text-primary"></i>
+                                                            <div class="ml-auto p-2">
+                                                                <div class="report-box__indicator 
+                                                                    {% if credits < 5 %}
+                                                                        bg-success
+                                                                    {% elif credits >= 5 and credits <= 9 %}
+                                                                        bg-warning
+                                                                    {% else %}
+                                                                        bg-danger
+                                                                    {% endif %}
+                                                                    tooltip cursor-pointer">
+                                                                    {{ credits }} <span class="pr-1"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="text-3xl font-medium leading-8 mt-6">{{ course.code }}</div>
+                                                        <div class="text-base text-slate-500 mt-1">{{ course.name }}</div>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    {% endwith %}
+                                {% endif %}
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- END: General Report -->
+            <!-- BEGIN: Weekly Top Products -->
+            <div class="col-span-12 mt-6">
+                <div class="intro-y block sm:flex items-center h-10">
+                    <h2 class="text-lg font-medium truncate mr-5">
+                        Recent Assignments
+                    </h2>
+                    <a href="" class="ml-auto flex items-center text-primary"> <i data-lucide="refresh-ccw"
+                            class="w-4 h-4 mr-3"></i> Refresh </a>
+                </div>
+                <div class="intro-y overflow-auto lg:overflow-visible mt-8 sm:mt-0">
+                    <table class="table table-report sm:mt-2" id="datatable">
+                        <thead>
+                            <tr>
+                                <th class="whitespace-nowrap">COURSE CODE</th>
+                                <th class="whitespace-nowrap">ASSIGNMENT NAME</th>
+                                <th class="whitespace-nowrap">STATUS</th>
+                                <th class="text-center whitespace-nowrap">TOTAL</th>
+                                <th class="text-center whitespace-nowrap">DUE DATE</th>
+                                <th class="text-center whitespace-nowrap">ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for assignment in data.assignments %}
+                            <tr class="intro-x">
+                                <td class="whitespace-nowrap w-40">{{ assignment.course.code}}</td>
+                                <td>
+                                    <a href="" class="font-medium whitespace-nowrap">{{ assignment.title }}</a>
+                                    <div class="text-slate-500 text-xs whitespace-nowrap mt-0.5">{{ assignment.course.name }}</div>
+                                </td>
+
+                                <td class="w-40">
+                                    <div
+                                        class="flex items-center {% if assignment.status == 'active' %}text-success{% else %}text-danger{% endif %}">
+                                        <i data-lucide="{% if assignment.status == 'active' %}check-square{% else %}square{% endif %}"
+                                            data-lucide="check-square" class="w-4 h-4 mr-2"></i> {{ assignment.status.title }}
+                                    </div>
+                                </td>
+                                <td class="text-center">{{ assignment.total }}</td>
+                                <td class="text-center">{{ assignment.due_date }}</td>
+                                <td class="table-report__action w-56">
+                                    <div class="flex justify-center items-center">
+                                        <a class="flex items-center mr-3" href="{% url 'get_assignment_uuid' course_code=assignment.course.code assignmnet_id=assignment.id%}"> <i data-lucide="edit"
+                                                class="w-4 h-4 mr-1"></i> Manage </a>
+                                        <a class="flex items-center text-warning"
+                                            href="">
+                                            <i data-lucide="eye-off" class="w-4 h-4 mr-1"></i> Hide </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- END: Weekly Top Products -->
+        </div>
+    </div>
+    <div class="col-span-12 2xl:col-span-3">
+        <div class="2xl:border-l -mb-10 pb-10">
+            <div class="2xl:pl-6 grid grid-cols-12 gap-x-6 2xl:gap-x-0 gap-y-6">
+                <!-- BEGIN: Transactions -->
+                <div class="col-span-12 md:col-span-6 xl:col-span-4 2xl:col-span-12 mt-3 2xl:mt-8">
+                    <div class="intro-x flex items-center h-10">
+                        <h2 class="text-lg font-medium truncate mr-5">
+                            Returned Assignments
+                        </h2>
+                    </div>
+                    <div class="mt-5 scrollable h-20">
+                        {% for assignment in data.returned %}
+                        <a href="{% url 'get_assignment_uuid' course_code=assignment.submission.assignment.course.code assignmnet_id=assignment.submission.assignment.id %}">
+                            <div class="intro-x">
+                                <div class="box px-5 py-3 mb-3 flex items-center zoom-in">
+                                    <div class="w-10 h-10 flex-none image-fit rounded-full overflow-hidden">
+                                        <img alt="Midone - HTML Admin Template"
+                                            src="{% static 'dist/images/profile-13.jpg' %}">
+                                    </div>
+                                    <div class="ml-4 mr-auto">
+                                        <div class="font-medium">{{ assignment.submission.assignment.course.code }} - {{ assignment.submission.assignment.title }}</div>
+                                        <div class="text-slate-500 text-xs mt-0.5 truncate">{{ assignment.feedback }}</div>
+                                    </div>
+                                    <div
+                                        class="
+                                        {% widthratio assignment.marks assignment.submission.assignment.total 100 as percentage %}
+                                        {% if percentage > 71 %}
+                                            text-success
+                                        {% elif percentage >= 40 and percentage <= 70 %}
+                                            text-warning
+                                        {% else %}
+                                            text-danger
+                                        {% endif %}
+                                        ">
+                                        {{ assignment.marks }}</div>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                        {% if not data.returned_assignments and data.returned_assignments.count == 0 %}
+                        <a href="" class="intro-x w-full block text-center rounded-md py-3 border border-dotted border-slate-400 dark:border-darkmode-300 text-slate-500">View
+                            More
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <!-- END: Transactions -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END: Content -->
+{% endblock%}

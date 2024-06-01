@@ -1,0 +1,16 @@
+{% load static %}
+<!-- BEGIN: JS Assets-->
+<script src="/static/dist/js/app.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="{% static 'dist/js/jquery-3.7.1.min.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+<script src="/static/dist/js/jquery.passwordRequirements.js"></script>
+<script src="/static/dist/js/dataTables.min.js"></script>
+<script>
+    function toggleMode(event) {
+        event.preventDefault();
+        $('html').toggleClass('light dark');
+    }
+
+    $('#dark-mode-switcher').click(toggleMode)
+</script>

@@ -1,0 +1,452 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block content %}
+<div class="grid grid-cols-12 gap-6" id="content">
+    <!-- BEGIN: Profile Menu -->
+    <div class="col-span-12 lg:col-span-4 2xl:col-span-3 flex lg:block hidden flex-col-reverse">
+        <div class="intro-y box mt-5">
+            <div class="relative flex items-center p-5">
+                <div class="w-12 h-12 image-fit">
+                    <img alt="Midone - HTML Admin Template" class="rounded-full"
+                        src="data:image/jpeg;base64,{{ request.user.image.decode }}">
+                </div>
+                <div class="ml-4 mr-auto">
+                    <div class="font-medium text-base">{{ data.preferences.salutation.title }}. {{ request.user.get_full_name }}</div>
+                    <div class="text-slate-500">{{ request.user.program.short }}</div>
+                </div>
+            </div>
+            <div class="p-5 border-t border-slate-200/60 dark:border-darkmode-400" id="trigger">
+                <form method="POST">
+                    <div class="intro-y" id="trigger">
+                        <div class="mt-3">
+                            <label for="preference__form__salutations" class="form-label">Salutations (Optional)</label>
+                            <select id="preference__form__salutations" class="tom-select w-full"
+                                name="preference__form__salutations" data-search="true">
+                                <option
+                                    value="{{ data.preferences.salutation.title }}"
+                                    selected>{% if data.preferences.salutation is not None %}{{ data.preferences.salutation.title }}{% else %}Please Choose{% endif %}</option>
+                                <option value="mr">Mr</option>
+                                <option value="mrs">Mrs</option>
+                                <option value="sir">Sir</option>
+                                <option value="madam">Madam</option>
+                                <option value="ms">Ms</option>
+                                <option value="attr">Attr</option>
+                                <option value="eng">Eng</option>
+                                <option value="dr">Dr</option>
+                                <option value="prof">Prof</option>
+                            </select>
+                        </div>
+                        <div class="form-check form-switch flex flex-col items-start mt-3">
+                            <label for="preference__form__dark__mode" class="form-check-label ml-0 mb-2">Dark
+                                Mode</label>
+                            <input id="preference__form__dark__mode" class="form-check-input" type="checkbox"
+                                name="preference__form__dark__mode" {% if data.preferences.theme == 'dark' %} checked {% endif %}>
+                        </div>
+                        <div class="form-check form-switch flex flex-col items-start mt-3">
+                            <label for="preference__form__notifications" class="form-check-label ml-0 mb-2">Receive
+                                Notifications</label>
+                            <input id="preference__form__notifications" class="form-check-input" type="checkbox"
+                                name="preference__form__notifications" {% if data.preferences.notification %} checked {% endif %}>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- END: Profile Menu -->
+    <div class="col-span-12 lg:col-span-8 2xl:col-span-9">
+        {% include 'components/messages.html' %}
+        <!-- BEGIN: Display Information -->
+        <div class="intro-y box lg:mt-5">
+            <div class="flex items-center p-5 border-b border-slate-200/60 dark:border-darkmode-400">
+                <h2 class="font-medium text-base mr-auto">
+                    Account Information
+                </h2>
+            </div>
+            <div class="p-5">
+                <form method="POST" enctype="multipart/form-data" id="account__details__form">
+                    {% csrf_token %}
+                    <div class="flex flex-col-reverse xl:flex-row flex-col">
+                        <div class="flex-1 mt-6 xl:mt-0">
+                            <div class="grid grid-cols-12 gap-x-5">
+                                <div class="col-span-12 2xl:col-span-6">
+                                    <div>
+                                        <label for="name" class="form-label">Name</label>
+                                        <input id="name" type="text" class="form-control" placeholder="John Doe"
+                                            value="{{ request.user.get_full_name }}" name="name" {% if not request.user.is_superuser %}disabled{% endif %}>
+                                    </div>
+                                    <div class="mt-3">
+                                        <label for="registration__number" class="form-label">
+                                            {% if request.user.is_staff or request.user.is_superuser %}
+                                                Employee ID
+                                            {% else %}
+                                                Registration Number
+                                            {% endif %}</label>
+                                        <input id="registration__number" type="text" class="form-control"
+                                            value="{{ request.user.username }}" name="registration__number" disabled>
+                                    </div>
+                                </div>
+                                {% if not request.user.is_staff and not request.user.is_superuser %}
+                                <div class="col-span-12 2xl:col-span-6">
+                                    <div class="mt-3 2xl:mt-0">
+                                        <label for="program" class="form-label">Program</label>
+                                        <select id="program" data-search="true" class="tom-select w-full" {% if data.program %} disabled {% endif %} name="program">
+                                            <option selected>{{ data.program }}</option>
+                                            {% if data.program is None %}
+                                            <option>Select Program Below</option>
+                                            {% for program in programs %}
+                                            <option value="{{ program.name }}">{{ program.name }}</option>
+                                            {% endfor %}
+                                            {% else %}
+                                            <option>{{ user.program }}</option>
+                                            {% endif %}
+                                        </select>
+                                    </div>
+                                    <div class="mt-3">
+                                        <label for="academic__year" class="form-label">Year of Study</label>
+                                        <input id="academic__year" type="text" class="form-control"
+                                            value="Year {{ data.yos }}" name="academic__year" disabled>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="col-span-12 2xl:col-span-6">
+                                    <div class="mt-3 2xl:mt-0">
+                                        <label for="program" class="form-label">Courses</label>
+                                        <select id="program" data-search="true" class="tom-select w-full" name="program"
+                                            multiple disabled>
+                                            {% for course in data.courses %}
+                                            <option disabled selected>{{ course.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="mt-3">
+                                        <label for="academic__year" class="form-label">Department</label>
+                                        <input id="academic__year" type="text" class="form-control"
+                                            value="{{ data.department }}" name="academic__year" disabled>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                <div class="col-span-12 2xl:col-span-6">
+                                    <div class="mt-3">
+                                        <label for="email__address" class="form-label">Email</label>
+                                        <input id="email__address" type="email" class="form-control"
+                                            value="{{ request.user.email }}" name="email__address"
+                                            placeholder="example@gmail.com">
+                                    </div>
+                                </div>
+                                <div class="col-span-12 2xl:col-span-6">
+                                    <div class="mt-3">
+                                        <label for="phone__number" class="form-label">Phone Number</label>
+                                        <input id="phone__number" type="text" class="form-control" name="phone__number"
+                                            placeholder="Phone Number" {% if request.user.phone %}
+                                            value="{{ request.user.phone }}" {% endif %}>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary w-30 mt-3" id="account__details__form-btn">Update
+                                Details</button>
+                        </div>
+                        <div class="w-52 mx-auto xl:mr-0 xl:ml-6">
+                            <div
+                                class="border-2 border-dashed shadow-sm border-slate-200/60 dark:border-darkmode-400 rounded-md p-5">
+                                <div class="h-40 relative image-fit cursor-pointer zoom-in mx-auto">
+                                    <img class="rounded-md" alt="Profile Photo"
+                                        src="data:image/*;base64,{{ request.user.image.decode }}" id="image__preview"
+                                        alt="Profile Photo">
+                                    <div title="Remove this profile photo?"
+                                        class="tooltip w-5 h-5 flex items-center justify-center absolute rounded-full text-white bg-danger right-0 top-0 -mr-2 -mt-2 hidden"
+                                        id="image__clear-btn">
+                                        <i data-lucide="x" class="w-4 h-4"></i>
+                                    </div>
+                                </div>
+                                <div class="mx-auto cursor-pointer relative mt-5">
+                                    <button class="btn btn-primary w-full">Change Photo</button>
+                                    <input type="file" class="w-full h-full top-0 left-0 absolute opacity-0"
+                                        id="image__upload-btn" accept="image/jpeg, image/png, image/jpg"
+                                        name="image__upload-btn">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- END: Display Information -->
+        <!-- BEGIN: Personal Information -->
+        <div class="intro-y box mt-5">
+            <div class="flex items-center p-5 border-b border-slate-200/60 dark:border-darkmode-400">
+                <h2 class="font-medium text-base mr-auto">
+                    Change Password
+                </h2>
+            </div>
+            <div class="p-5">
+                <form method="POST" id="change__password__form">
+                    {% csrf_token %}
+                    <div class="grid grid-cols-12 gap-x-5">
+                        <div class="col-span-12 xl:col-span-6">
+                            <div>
+                                <label for="current__password" class="form-label">Current Password</label>
+                                <input id="current__password" type="password" class="form-control"
+                                    name="current__password">
+                            </div>
+                            <div class="mt-3">
+                                <label for="confirm__password" class="form-label">Confirm Password</label>
+                                <input id="confirm__password" type="password" class="form-control"
+                                    name="confirm__password">
+                            </div>
+                        </div>
+                        <div class="col-span-12 xl:col-span-6">
+                            <div class="mt-3 xl:mt-0">
+                                <label for="new__password" class="form-label">New Password</label>
+                                <input id="new__password" type="password" class="form-control" name="new__password">
+                            </div>
+                            <div class="mt-3">
+                                <label for="update-profile-form-11" class="form-label">Captcha</label>
+                                <div class="flex items-center gap-6">
+                                    {{ form.captcha_field }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-start mt-4">
+                        <button class="btn btn-primary w-30" id="account__password__form-btn">Update Password</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- END: Personal Information -->
+    </div>
+</div>
+
+<div class="flex justify-center my-auto mx-auto fixed z-50 top-0 bottom-0 right-0 left-0 hidden" id="loader">
+    <div class="loader"></div>
+</div>
+{% endblock%}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        function change_password() {
+            $.ajax({
+                url: '{% url "change_password" %}',
+                type: 'POST',
+                data: $('#change__password__form').serialize(),
+                success: function (response) {
+                    return response["message"];
+                },
+                error: function (response) {
+                    setTimeout(function () {
+                        $("#content").removeClass("blur");
+                        $("#loader").addClass("hidden");
+
+                        $("#notification-content").text(response.responseJSON.message);
+                        Toastify({
+                            node: $("#notification").clone().removeClass("hidden")[0],
+                            duration: 3000,
+                            newWindow: true,
+                            close: true,
+                            gravity: "top",
+                            position: "right",
+                            stopOnFocus: true,
+                        }).showToast();
+                    }, 1500)
+                }
+            });
+        }
+
+        $("#image__upload-btn").on("change", function () {
+            var image = this.files[0];
+            var prevImageUrl = $("#image__preview").attr("src");
+
+            if (image) {
+                var imageUrl = URL.createObjectURL(image);
+                $("#image__preview").attr("src", imageUrl);
+                // $("#image__clear-btn").removeClass("hidden");
+            } else if (prevImageUrl) {
+                // If no image is selected but there was a previous image, revert to the previous image
+                $("#image__preview").attr("src", prevImageUrl);
+            } else {
+                // If no image is selected and there was no previous image, clear the preview
+                $("#image__preview").removeAttr("src");
+                // $("#image__clear-btn").addClass("hidden");
+            }
+        });
+
+
+        $("#image__clear-btn").on("click", function () {
+            $("#image__preview").attr("src", "");
+            $(this).addClass("hidden");
+        });
+
+        $("#account__details__form-btn").on("click", function (event) {
+            event.preventDefault();
+
+            
+            $("#content").addClass("blur");
+            $("#loader").removeClass("hidden");
+
+            var formData = new FormData(); // Create FormData object
+
+            // Append form data
+            $("#account__details__form").serializeArray().forEach(function(field){
+                formData.append(field.name, field.value);
+            });
+
+            // Append file data
+            formData.append("image__upload-btn", $("#image__upload-btn")[0].files[0]);
+            
+            $.ajax({
+                type: "POST",
+                url: "{% url 'update_profile' %}",
+                data: formData, // This is the code tnow does not get the image data from the form
+                contentType: false, // Set content type to false for FormData
+                processData: false, // Don't process data (FormData will handle it)
+                success: function (response) {
+                    setTimeout(function () {
+                        $("#content").removeClass("blur");
+                        $("#loader").addClass("hidden");
+
+                        $("#notification-content").text(response["message"]);
+                        $("#notification-action").text("");
+                        Toastify({
+                            node: $("#notification").clone().removeClass("hidden")[0],
+                            duration: 3000,
+                            newWindow: true,
+                            close: true,
+                            gravity: "top",
+                            position: "right",
+                            stopOnFocus: true,
+                        }).showToast();
+                    }, 1500)
+                },
+                error: function (response) {
+                    setTimeout(function () {
+                        $("#content").removeClass("blur");
+                        $("#loader").addClass("hidden");
+
+                        $("#notification-content").text(response.responseJSON.message);
+                        Toastify({
+                            node: $("#notification").clone().removeClass("hidden")[0],
+                            duration: 3000,
+                            newWindow: true,
+                            close: true,
+                            gravity: "top",
+                            position: "right",
+                            stopOnFocus: true,
+                        }).showToast();
+                    }, 1500)
+                }
+            })
+        });
+
+        $("#account__password__form-btn").on("click", function (event) {
+            event.preventDefault();
+
+            $("#content").addClass("blur");
+            $("#loader").removeClass("hidden");
+
+            $.ajax({
+                type: "POST",
+                url: "{% url 'captcha' %}",
+                data: $("#change__password__form").serialize(),
+                success: function (response) {
+                    setTimeout(function () {
+                        var results = change_password();
+                        $("#content").removeClass("blur");
+                        $("#loader").addClass("hidden");
+
+                        $("#notification-content").text(results);
+                        $("#notification-action").text("");
+                        Toastify({
+                            node: $("#notification").clone().removeClass("hidden")[0],
+                            duration: 3000,
+                            newWindow: true,
+                            close: true,
+                            gravity: "top",
+                            position: "right",
+                            stopOnFocus: true,
+                        }).showToast();
+                        window.location.href = "{% url 'login' %}";
+                    }, 1500)
+                },
+                error: function (response) {
+                    setTimeout(function () {
+                        $("#content").removeClass("blur");
+                        $("#loader").addClass("hidden");
+
+                        $("#notification-content").text(response.responseJSON.message);
+                        Toastify({
+                            node: $("#notification").clone().removeClass("hidden")[0],
+                            duration: 3000,
+                            newWindow: true,
+                            close: true,
+                            gravity: "top",
+                            position: "right",
+                            stopOnFocus: true,
+                        }).showToast();
+                    }, 1500)
+                }
+            })
+        });
+
+        $("#trigger").on("change", function (event) {
+            var changedElement = event.target; // Get the changed element
+
+            if ($(changedElement).attr('id') != 'preference__form__dark__mode') {
+                $("#content").addClass("blur");
+                $("#loader").removeClass("hidden");
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "{% url 'change_preferences' %}",
+                data: {
+                    csrfmiddlewaretoken: "{{ csrf_token }}",
+                    dark_mode: $("#preference__form__dark__mode").is(":checked").toString(),
+                    notifications: $("#preference__form__notifications").is(":checked").toString(),
+                    salutations: $("#preference__form__salutations").val()
+                },
+                success: function (response) {
+                    if ($(changedElement).attr('id') == 'preference__form__dark__mode') {
+                        $("#dark-mode-switcher").click();
+                    }
+                    else{
+                        $("#content").removeClass("blur");
+                        $("#loader").addClass("hidden");
+                    };
+
+                    $("#notification-content").text(response.responseJSON.message);
+                    $("#notification-action").text("");
+                    Toastify({
+                        node: $("#notification").clone().removeClass("hidden")[0],
+                        duration: 3000,
+                        newWindow: true,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        stopOnFocus: true,
+                    }).showToast();
+                
+                },
+                error: function (response) {
+                    setTimeout(function () {
+                        $("#content").removeClass("blur");
+                        $("#loader").addClass("hidden");
+
+                        $("#notification-content").text(response.responseJSON.message);
+                        Toastify({
+                            node: $("#notification").clone().removeClass("hidden")[0],
+                            duration: 3000,
+                            newWindow: true,
+                            close: true,
+                            gravity: "top",
+                            position: "right",
+                            stopOnFocus: true,
+                        }).showToast();
+                    }, 1500)
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
