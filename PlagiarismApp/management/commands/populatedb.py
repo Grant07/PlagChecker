@@ -129,7 +129,7 @@ class Command(BaseCommand):
             department = Department.objects.create(name=department_names[x])
 
             lecturer = Lecturer.objects.create(
-                employee_id=lecturer_names[x], department=department, user=user
+                employee_id=user.username, department=department, user=user
             )
 
             program = Program.objects.create(

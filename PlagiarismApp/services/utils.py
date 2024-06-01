@@ -1,7 +1,6 @@
 import datetime
 import os
 import base64
-import tempfile
 import PyPDF2
 import uuid
 import io
@@ -83,7 +82,7 @@ class PlagiarismCheckerService:
     def preprocess_text(self, text):
         tokens = word_tokenize(text)
         stemmer = PorterStemmer()
-        stemmed_tokens = [stemmer.stem(token) for token in tokens]
+        stemmed_tokens = [stemmer.stem(token) for token in tokens if token.isalpha()]
         preprocessed_text = ' '.join(stemmed_tokens)
         return preprocessed_text
 
@@ -100,7 +99,7 @@ class PlagiarismCheckerService:
         for submission in self.all_submissions:
             comparison_text = self.extract_text_from_pdf(submission.file)
             similarity_percentage = self.compare_texts(current_text, comparison_text)
-            if similarity_percentage > 35:  # Only include non-zero similarities
+            if similarity_percentage > 0.35:  # similarity_threshold in decimal
                 similarity_report = {
                     "current_submission_id": str(self.current_submission.id),
                     "other_submission_id": str(submission.id),
