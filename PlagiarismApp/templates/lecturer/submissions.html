@@ -150,12 +150,18 @@
                                 </div>
                                 <div class="mt-1 w-full">
                                     {% if data.plagiarism_percentage is not None %}
-                                    <a href="{% url 'get_plagiarism_report_for_submission' submission_id=data.submissions.id%}" class="flex flex-row justify-between m-2">
-                                        <div class="font-medium mr-auto">{{ data.plagiarism_percentage }} %</div>
-                                        <div class="text-slate-500">
-                                            <i data-lucide="arrow-right" class="w-4 h-4 text-slate-500"></i>
-                                        </div>
-                                    </a>
+                                        {% if data.plagiarism_percentage != 0 %}
+                                        <a href="{% url 'get_plagiarism_report_for_submission' submission_id=data.submissions.id%}" class="flex flex-row justify-between m-2">
+                                            <div class="font-medium mr-auto">{{ data.plagiarism_percentage }} %</div>
+                                            <div class="text-slate-500">
+                                                <i data-lucide="arrow-right" class="w-4 h-4 text-slate-500"></i>
+                                            </div>
+                                        </a>
+                                        {% else %}
+                                        <span class="flex flex-row justify-between m-2">
+                                            <div class="font-medium mr-auto">{{ data.plagiarism_percentage }} %</div>
+                                        </span>
+                                        {% endif %}
                                     {% else %}
                                     <div class="flex flex-row justify-between mt-2">
                                         <div class="font-medium mr-auto">Plagiarism Detection Disabled</div>

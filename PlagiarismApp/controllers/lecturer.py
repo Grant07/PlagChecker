@@ -215,6 +215,11 @@ def get_submission_with_id(request, submission_id: str):
         # Slice the list to contain only the item with the highest similarity percentage
         highest_similarity_result = sorted_results[:1]
 
+    try:
+        plagiarism_percentage = round(highest_similarity_result[0]['similarity_percentage'], 2)
+    except:
+        plagiarism_percentage = 0
+
     return render(
         request,
         "lecturer/submissions.html",
@@ -225,7 +230,7 @@ def get_submission_with_id(request, submission_id: str):
                 "submissions": submission,
                 "preferences": preferences,
                 "submission_status": submission_status,
-                "plagiarism_percentage": round(highest_similarity_result[0]['similarity_percentage'], 2) if report is not None else None,
+                "plagiarism_percentage": plagiarism_percentage,
             },
         },
     )
