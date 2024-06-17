@@ -1,6 +1,4 @@
 venv/
 __pycache__/
-temp_dir/
-CheckerModel/
-.vscode/
 db.sqlite3
+celerybeat-schedule
